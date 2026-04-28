@@ -266,6 +266,23 @@ GET    /api/payments/escrow/:escrowId   - Get escrow details
 POST   /api/payments/mpesa              - Process M-Pesa payment
 POST   /api/payments/escrow/:jobId/milestone-release - Release milestone
 POST   /api/payments/service-credit     - Issue service credit
+POST   /api/payments/escrow/:escrowId/dispute - Open escrow dispute
+POST   /api/payments/withdraw          - Withdraw earnings
+```
+
+### Currency Routes
+```
+GET    /api/currency/supported         - Get supported currencies
+GET    /api/currency/rates             - Get latest exchange rates
+GET    /api/currency/convert           - Convert amount between currencies
+```
+
+### Wallet Routes
+```
+GET    /api/wallets                    - Get current wallet balances
+POST   /api/wallets/deposit            - Add funds to pending wallet balance
+POST   /api/wallets/release            - Release pending funds to wallet balance
+POST   /api/wallets/withdraw           - Withdraw funds from wallet balance
 ```
 
 ### Rating Routes
@@ -277,9 +294,9 @@ PUT    /api/ratings/:ratingId/flag      - Flag rating
 ```
 
 ### Location Routes
-```
-GET    /api/location/jobs               - Get nearby jobs
-GET    /api/location/workers            - Get nearby workers
+``` and hashes it before storage
+3. **Email/SMS Delivery**: OTP sent via email or Twilio SMS
+4. **OTP Verification**: User enters OTP within 5 minutes- Get nearby workers
 GET    /api/location/hotspots           - Get demand hotspots
 GET    /api/location/suppliers          - Get nearby suppliers
 ```
