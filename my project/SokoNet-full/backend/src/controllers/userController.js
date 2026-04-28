@@ -6,6 +6,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const EmailService = require('../services/EmailService');
 
 class UserController {
   /**
@@ -23,17 +24,18 @@ class UserController {
 
       // Generate 6-digit OTP
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiry = new Date(Date.now() + 10 * 60000); // 10 minutes
+      const otpExpiry = new Date(Date.now() + 5 * 60000); // 5 minutes
+      const hashedOtp = await bcrypt.hash(otp, 10);
 
       let user = await User.findOne(contactField);
 
       if (user) {
-        user.otpCode = otp;
+        user.otpCode = hashedOtp;
         user.otpExpiry = otpExpiry;
       } else {
         user = new User({
           ...contactField,
-          otpCode: otp,
+          otpCode: hashedOtp,
           otpExpiry,
           userType: 'customer'
         });
@@ -41,8 +43,11 @@ class UserController {
 
       await user.save();
 
-      // In production, send via email/SMS provider
-      console.log(`[OTP] ${contactValue}: ${otp}`);
+      if (email) {
+        await EmailService.sendOTPEmail(email, otp);
+      } else {
+        console.log(`[OTP] ${contactValue}: ${otp}`);
+      }
 
       res.json({
         success: true,
@@ -68,13 +73,19 @@ class UserController {
         return res.status(404).json({ success: false, message: 'User not found' });
       }
 
-      if (user.otpCode !== otp || user.otpExpiry < new Date()) {
+      if (!user.otpCode || user.otpExpiry < new Date()) {
+        return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+      }
+
+      const otpMatches = await bcrypt.compare(otp, user.otpCode);
+      if (!otpMatches) {
         return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
       }
 
       // Mark contact as verified
       if (email) {
         user.email = email.toLowerCase().trim();
+        user.isEmailVerified = true;
       } else {
         user.isPhoneVerified = true;
       }

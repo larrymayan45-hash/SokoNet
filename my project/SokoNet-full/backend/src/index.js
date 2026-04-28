@@ -24,6 +24,8 @@ const skillsRoutes = require('./routes/skills');
 const trustCirclesRoutes = require('./routes/trustCircles');
 const franchisesRoutes = require('./routes/franchises');
 const dashboardRoutes = require('./routes/dashboard');
+const currencyRoutes = require('./routes/currency');
+const walletRoutes = require('./routes/wallets');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -65,6 +67,8 @@ app.use('/api/location', locationRoutes);
 app.use('/api/skills', skillsRoutes);
 app.use('/api/trust-circles', trustCirclesRoutes);
 app.use('/api/franchises', franchisesRoutes);
+app.use('/api/currency', currencyRoutes);
+app.use('/api/wallets', walletRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 // Error handling middleware
